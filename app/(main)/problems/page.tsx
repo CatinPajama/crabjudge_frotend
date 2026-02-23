@@ -8,14 +8,6 @@ const fetchProblems = async () => {
 	});
 	const data = await res.json();
 
-	for (let i = 0; i < 100; i++) {
-		data.push({
-			problem_id: i + 3,
-			title: `lol ${i}`,
-			difficulty: "easy"
-		})
-	}
-	console.log(data);
 	return data;
 }
 export default async function Problems() {
@@ -42,7 +34,7 @@ export default async function Problems() {
 								</Link>
 							</TableCell>
 							<TableCell className="text-right" >
-								<DifficultyBadge difficulty={problem.difficulty}/>
+								<DifficultyBadge difficulty={problem.difficulty} />
 							</TableCell>
 						</TableRow>
 					)

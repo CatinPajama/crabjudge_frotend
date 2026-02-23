@@ -27,26 +27,32 @@ export function SignupForm({
 }: React.FormHTMLAttributes<HTMLDivElement>) {
 
     const [error, setError] = React.useState<string | null>(null);
+    const [sent, setSent] = React.useState(false);
 
-    const router = useRouter();
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setError(null)
         const formData = new FormData(e.currentTarget);
-        const username = formData.get('username') as string;
-        const password = formData.get('password') as string;
+        const email = formData.get('email') as string;
 
-        const response = await fetch('/api/signup', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-            credentials: 'include',
-        })
-        if (response.ok) {
-            router.push('/login')
-        } else {
-            setError('Signup failed. Please try again.');
+        try {
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+                credentials: 'include',
+            })
+
+            if (response.ok) {
+                setSent(true)
+            } else {
+                const text = await response.text()
+                setError(text || 'Signup failed. Please try again.')
+            }
+        } catch (err) {
+            setError('Network error. Please try again.')
         }
     }
     return (
@@ -58,25 +64,28 @@ export function SignupForm({
 
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleSubmit}>
-                        <FieldGroup>
-                            <Field>
-                                <FieldLabel htmlFor="username">username</FieldLabel>
-                                <Input id="username" name="username" type="text" placeholder="John Doe" required />
-                            </Field>
-                            <Field>
-                                <FieldLabel htmlFor="password">Password</FieldLabel>
-                                <Input id="password" name="password" type="password" required />
-                            </Field>
-                            {error && <p className="text-red-500">{error}</p>}
-                            <Field>
-                                <Button type="submit">Create Account</Button>
-                                <FieldDescription className="text-center">
-                                    Already have an account? <Link href="/login">Sign in</Link>
-                                </FieldDescription>
-                            </Field>
-                        </FieldGroup>
-                    </form>
+                    {sent ? (
+                        <div className="text-center">
+                            <p className="mb-2">Check your email — we sent a verification link.</p>
+                            <p className="text-sm text-muted-foreground">Open the email and follow the link to complete signup.</p>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSubmit}>
+                            <FieldGroup>
+                                <Field>
+                                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                                    <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+                                </Field>
+                                {error && <p className="text-red-500">{error}</p>}
+                                <Field>
+                                    <Button type="submit">Send verification email</Button>
+                                    <FieldDescription className="text-center">
+                                        Already have an account? <Link href="/login">Sign in</Link>
+                                    </FieldDescription>
+                                </Field>
+                            </FieldGroup>
+                        </form>
+                    )}
                 </CardContent>
             </Card>
         </div>

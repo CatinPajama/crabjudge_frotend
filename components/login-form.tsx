@@ -24,7 +24,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-    const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,13 +38,15 @@ export function LoginForm({
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ "username" : username, "password" : password }),
+      body: JSON.stringify({ "username": username, "password": password }),
       credentials: 'include',
     })
     if (response.ok) {
       router.push('/')
     } else {
-      setError('Login failed. Please try again.');
+      // try read server message, fallback to generic message
+      const text = await response.text().catch(() => null)
+      setError(text || 'Login failed. Please try again.')
     }
   }
   return (
@@ -56,7 +58,7 @@ export function LoginForm({
               <Field>
                 <FieldLabel htmlFor="username">username</FieldLabel>
                 <Input
-                name = "username"
+                  name="username"
                   id="username"
                   type="text"
                   placeholder="John Doe"
@@ -75,6 +77,18 @@ export function LoginForm({
                 </div>
                 <Input name="password" id="password" type="password" required />
               </Field>
+
+              {/* Show error message when login fails */}
+              {error && (
+                <div
+                  className="text-sm text-red-600"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  {error}
+                </div>
+              )}
+
               <Field>
                 <Button type="submit">Login</Button>
                 <FieldDescription className="text-center">
