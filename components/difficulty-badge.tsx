@@ -1,17 +1,16 @@
 import { Badge } from "./ui/badge";
 
-const Difficulty = {
-    "easy" : "bg-green-200 text-green-800",
-    "medium" : "bg-yellow-200 text-yellow-800",
-    "hard" : "bg-red-200 text-red-800",
+const difficultyStyles: Record<string, string> = {
+    easy: "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-200",
+    medium: "bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200",
+    hard: "bg-red-100 text-red-900 dark:bg-red-900/30 dark:text-red-200",
+};
 
-}
+export function DifficultyBadge({ difficulty }: { difficulty: string }) {
+    const key = difficulty.toLowerCase();
+    const classes =
+        difficultyStyles[key] ??
+        "bg-muted text-muted-foreground dark:bg-muted/40 dark:text-muted-foreground";
 
-export function DifficultyBadge({difficulty} : {difficulty : string}) {
-    return (
-        <Badge className={Difficulty[difficulty]}>
-            {difficulty}
-            <div className="text-green"></div>
-        </Badge>
-    )
+    return <Badge className={classes}>{difficulty}</Badge>;
 }

@@ -30,17 +30,23 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${geistSans.variable}`} suppressHydrationWarning>
-            <body
-                className={`${geistSans.className} antialiased`}
-            >
-                {/* <QueryClientProvider client={queryClient}> */}
-                <ThemeProvider>
-                    {children}
-                    <Toaster closeButton duration={20 * 1000} />
-                </ThemeProvider>
-                {/* </QueryClientProvider> */}
-            </body>
-        </html>
+        <html
+        lang="en"
+        suppressHydrationWarning
+      >
+        <body
+          className={`${geistSans.className} ${inter.variable} antialiased`}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster closeButton duration={20 * 1000} />
+          </ThemeProvider>
+        </body>
+      </html>
     );
 }

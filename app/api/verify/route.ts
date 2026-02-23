@@ -1,22 +1,46 @@
 import { headers } from "next/headers";
 
+interface VerifyRequestBody {
+    token?: string;
+    username?: string;
+    password?: string;
+}
+
+const BACKEND_BASE_URL =
+    process.env.BACKEND_URL ?? "http://localhost:8080";
+
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { token, username, password } = body || {};
+        const body = (await req.json()) as Partial<VerifyRequestBody> | null;
+
+        const token =
+            typeof body?.token === "string" ? body.token : undefined;
+        const username =
+            typeof body?.username === "string" ? body.username : undefined;
+        const password =
+            typeof body?.password === "string" ? body.password : undefined;
 
         if (!token) {
-            return new Response(JSON.stringify({ error: "Missing token" }), { status: 400, headers: { "Content-Type": "application/json" } });
+            return new Response(
+                JSON.stringify({ error: "Missing or invalid token" }),
+                {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
         }
 
         // Forward POST to backend signup confirmation endpoint with token in query string
-        const backendUrl = `http://localhost:8080/signup/confirmation?verification_token=${encodeURIComponent(token)}`;
+        const backendUrl = `${BACKEND_BASE_URL}/signup/confirmation?verification_token=${encodeURIComponent(
+            token
+        )}`;
 
         const headerList = await headers();
+
         // Backend expects form-encoded data for username/password
         const params = new URLSearchParams();
-        if (username !== undefined) params.append("username", String(username));
-        if (password !== undefined) params.append("password", String(password));
+        if (username !== undefined) params.append("username", username);
+        if (password !== undefined) params.append("password", password);
 
         const res = await fetch(backendUrl, {
             method: "POST",
@@ -26,15 +50,23 @@ export async function POST(req: Request) {
                 Cookie: headerList.get("cookie") || "",
             },
             body: params.toString(),
-            credentials: "include",
         });
-        const res_body = await res.text();
+
+        const resBody = await res.text();
+
         // Proxy the backend response back to the client
-        return new Response(res_body, {
+        return new Response(resBody, {
             status: res.status,
             headers: res.headers,
         });
     } catch (err) {
-        return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { "Content-Type": "application/json" } });
+        console.error("Error in /api/verify:", err);
+        return new Response(
+            JSON.stringify({ error: "Internal server error" }),
+            {
+                status: 500,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
     }
 }

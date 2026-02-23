@@ -10,7 +10,12 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel, FieldDescription } from "@/components/ui/field";
+import {
+    Field,
+    FieldGroup,
+    FieldLabel,
+    FieldDescription,
+} from "@/components/ui/field";
 
 export default function VerifyPage() {
     const router = useRouter();
@@ -55,26 +60,59 @@ export default function VerifyPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen p-6">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Complete signup</CardTitle>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/60 px-4">
+            <Card className="w-full max-w-md shadow-lg border">
+                <CardHeader className="space-y-1 text-center">
+                    <CardTitle className="text-2xl font-semibold">
+                        Complete signup
+                    </CardTitle>
+                    <FieldDescription>
+                        Choose a username and password to finish creating your
+                        account.
+                    </FieldDescription>
                 </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit}>
+                <CardContent className="pt-4">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <FieldGroup>
                             <Field>
                                 <FieldLabel htmlFor="username">Username</FieldLabel>
-                                <Input id="username" name="username" required />
+                                <Input
+                                    id="username"
+                                    name="username"
+                                    autoComplete="username"
+                                    required
+                                />
                             </Field>
                             <Field>
                                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                                <Input id="password" name="password" type="password" required />
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    required
+                                />
                             </Field>
-                            {error && <div className="text-red-500">{error}</div>}
+
+                            {error && (
+                                <div
+                                    className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                                    role="alert"
+                                    aria-live="polite"
+                                >
+                                    {error}
+                                </div>
+                            )}
+
                             <Field>
-                                <Button type="submit" disabled={loading}>
-                                    {loading ? "Verifying..." : "Verify and create account"}
+                                <Button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full"
+                                >
+                                    {loading
+                                        ? "Verifying..."
+                                        : "Verify and create account"}
                                 </Button>
                             </Field>
                         </FieldGroup>

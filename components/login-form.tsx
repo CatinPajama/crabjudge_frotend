@@ -1,24 +1,23 @@
 "use client";
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import React from "react"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 export function LoginForm({
   className,
@@ -28,40 +27,59 @@ export function LoginForm({
 
   const router = useRouter();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
-    console.log(username);
-    const response = await fetch('/api/login', {
-      method: 'POST',
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+
+    const response = await fetch("/api/login", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ "username": username, "password": password }),
-      credentials: 'include',
-    })
+      body: JSON.stringify({ username, password }),
+      credentials: "include",
+    });
+
     if (response.ok) {
-      router.push('/')
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("crabjudge_username", username);
+      }
+      router.push("/");
     } else {
-      // try read server message, fallback to generic message
-      const text = await response.text().catch(() => null)
-      setError(text || 'Login failed. Please try again.')
+      const text = await response.text().catch(() => null);
+      setError(text || "Login failed. Please try again.");
     }
-  }
+  };
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
+    <div
+      className={cn(
+        "flex flex-col gap-6 w-full max-w-md mx-auto",
+        className
+      )}
+      {...props}
+    >
+      <Card className="shadow-lg border">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-semibold">
+            Welcome back
+          </CardTitle>
+          <CardDescription>
+            Sign in to continue solving problems.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="username">username</FieldLabel>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
                   name="username"
                   id="username"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="your_username"
+                  autoComplete="username"
                   required
                 />
               </Field>
@@ -75,13 +93,18 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input name="password" id="password" type="password" required />
+                <Input
+                  name="password"
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
               </Field>
 
-              {/* Show error message when login fails */}
               {error && (
                 <div
-                  className="text-sm text-red-600"
+                  className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
                   role="alert"
                   aria-live="polite"
                 >
@@ -90,9 +113,17 @@ export function LoginForm({
               )}
 
               <Field>
-                <Button type="submit">Login</Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <Link href="/signup">Sign up</Link>
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+                <FieldDescription className="mt-2 text-center text-muted-foreground">
+                  Don&apos;t have an account?{" "}
+                  <Link
+                    href="/signup"
+                    className="underline underline-offset-4"
+                  >
+                    Sign up
+                  </Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -100,5 +131,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
