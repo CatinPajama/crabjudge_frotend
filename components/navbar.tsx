@@ -3,7 +3,6 @@
 import {
     NavigationMenu,
     NavigationMenuItem,
-    NavigationMenuLink,
     NavigationMenuList,
     navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
@@ -47,25 +46,22 @@ export function Navbar() {
                 <NavigationMenu className="flex-1 justify-end">
                     <NavigationMenuList className="gap-2">
                         <NavigationMenuItem>
-                            <NavigationMenuLink
-                                href="/"
-                                className={navigationMenuTriggerStyle()}
-                            >
+                            <Link href="/" className={navigationMenuTriggerStyle()}>
                                 Home
-                            </NavigationMenuLink>
+                            </Link>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuLink
+                            <Link
                                 href="/problems"
                                 className={navigationMenuTriggerStyle()}
                             >
                                 Problems
-                            </NavigationMenuLink>
+                            </Link>
                         </NavigationMenuItem>
                         {username && (
                             <>
                                 <NavigationMenuItem>
-                                    <NavigationMenuLink
+                                    <Link
                                         href="/profile"
                                         className={navigationMenuTriggerStyle()}
                                     >
@@ -73,26 +69,26 @@ export function Navbar() {
                                             <User2 className="h-4 w-4" />
                                             <span>{username}</span>
                                         </span>
-                                    </NavigationMenuLink>
+                                    </Link>
                                 </NavigationMenuItem>
                                 <NavigationMenuItem>
-                                    <NavigationMenuLink
+                                    <Link
                                         href="/logout"
                                         className={navigationMenuTriggerStyle()}
                                     >
                                         Logout
-                                    </NavigationMenuLink>
+                                    </Link>
                                 </NavigationMenuItem>
                             </>
                         )}
                         {!username && (
                             <NavigationMenuItem>
-                                <NavigationMenuLink
+                                <Link
                                     href="/signup"
                                     className={navigationMenuTriggerStyle()}
                                 >
                                     Signup
-                                </NavigationMenuLink>
+                                </Link>
                             </NavigationMenuItem>
                         )}
                         <NavigationMenuItem>

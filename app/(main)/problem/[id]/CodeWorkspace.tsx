@@ -2,10 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Editor } from "@monaco-editor/react";
 import LangeSelector from "./LangSelector";
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { useTheme } from "next-themes";
 
@@ -47,6 +46,7 @@ export default function CodeWorkspace({ problem_id }: { problem_id: string }) {
     const [code, setCode] = useState<string>("");
     const editorRef = useRef<any>(null);
     const { resolvedTheme } = useTheme();
+    const queryClient = useQueryClient();
 
     const storageKey = `crabjudge_code_${problem_id}_${currLang}`;
 
@@ -88,9 +88,12 @@ export default function CodeWorkspace({ problem_id }: { problem_id: string }) {
 
     const mutation = useMutation({
         mutationFn: submitCode,
-        onSuccess: async (data) => {
-            const submission_id = await data.submission_id;
+        onSuccess: (data: { submission_id: string }) => {
+            const submission_id = data.submission_id;
             SetCurrSubmission(submission_id);
+            queryClient.invalidateQueries({
+                queryKey: ["problem-submissions", problem_id],
+            });
         },
     });
 
@@ -127,10 +130,7 @@ export default function CodeWorkspace({ problem_id }: { problem_id: string }) {
                     onMount={handleEditorDidMount}
                 />
             </Card>
-            <div className="flex flex-row-reverse gap-2 text-center">
-                <Button className="bg-accent text-foreground hover:text-background">
-                    <Link href={`/submissions/${problem_id}`}>Submissions</Link>
-                </Button>
+            <div className="flex flex-wrap items-center justify-end gap-2 text-center">
                 <LangeSelector SetCurrLang={SetCurrLang} Languages={Languages} />
                 <Button onClick={handleSubmit} disabled={isProcessing}>
                     {isProcessing && <Spinner />}
