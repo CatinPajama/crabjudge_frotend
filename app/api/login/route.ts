@@ -1,5 +1,11 @@
-// import { Base64Encoder } from "next-base64-encoder";
+import { verifyCsrf } from "@/lib/csrf";
+
 export async function POST(req: Request) {
+  const csrf = verifyCsrf(req);
+  if (!csrf.valid) {
+    return new Response(csrf.error, { status: 403 });
+  }
+
   const formjson = await req.json()
 
   console.log(formjson);

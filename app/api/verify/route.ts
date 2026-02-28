@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { verifyCsrf } from "@/lib/csrf";
 
 interface VerifyRequestBody {
     token?: string;
@@ -10,6 +11,10 @@ const BACKEND_BASE_URL =
     process.env.BACKEND_URL ?? "http://localhost:8080";
 
 export async function POST(req: Request) {
+    const csrf = verifyCsrf(req);
+    if (!csrf.valid) {
+        return new Response(csrf.error, { status: 403 });
+    }
     try {
         const body = (await req.json()) as Partial<VerifyRequestBody> | null;
 
